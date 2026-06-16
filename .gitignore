@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Experiments
+experiments/*
+!experiments/.gitkeep
+
+# Models / logs
+*.pt
+*.pth
+*.ckpt
+runs/
+wandb/
+
+# System
+.DS_Store
