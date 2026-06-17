@@ -34,7 +34,7 @@ class UAVGridEnv:
         max_steps=100,
         sensor_range=2,
         detection_probability=1.0,
-        seed=None,
+        seed=42,
     ):
         self.grid_size = grid_size
         self.n_uavs = n_uavs
@@ -174,6 +174,9 @@ class UAVGridEnv:
                     dist = abs(ux - x) + abs(uy - y)
 
                     if dist <= self.sensor_range:
+                        if self.visited_map[x, y] == 0.0:
+                            reward += 0.02
+
                         self.visited_map[x, y] = 1.0
 
                         if (x, y) in self.target_positions:

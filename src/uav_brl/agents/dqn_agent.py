@@ -84,6 +84,19 @@ class DQNAgent:
             action = torch.argmax(q_values, dim=1).item()
 
         return action
+    
+    def act_greedy(self, state):
+        state_tensor = torch.tensor(
+            state,
+            dtype=torch.float32,
+            device=self.device,
+        ).unsqueeze(0)
+
+        with torch.no_grad():
+            q_values = self.policy_net(state_tensor)
+            action = torch.argmax(q_values, dim=1).item()
+
+        return action
 
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.push(state, action, reward, next_state, done)

@@ -10,12 +10,6 @@ from uav_brl.utils.device import get_device
 
 
 def evaluate_agent(env, agent, n_episodes=5):
-    old_epsilon_start = agent.epsilon_start
-    old_epsilon_end = agent.epsilon_end
-
-    agent.epsilon_start = 0.0
-    agent.epsilon_end = 0.0
-
     rewards = []
     detected = []
 
@@ -25,7 +19,7 @@ def evaluate_agent(env, agent, n_episodes=5):
         total_reward = 0.0
 
         while not done:
-            action = agent.act(state)
+            action = agent.act_greedy(state)
             next_state, reward, done, info = env.step(action)
 
             total_reward += reward
@@ -33,9 +27,6 @@ def evaluate_agent(env, agent, n_episodes=5):
 
         rewards.append(total_reward)
         detected.append(info["detected_targets"])
-
-    agent.epsilon_start = old_epsilon_start
-    agent.epsilon_end = old_epsilon_end
 
     return np.mean(rewards), np.mean(detected)
 
@@ -72,6 +63,13 @@ def main():
 
     os.makedirs("experiments/dqn", exist_ok=True)
 
+
+    log_path = "experiments/dqn/training_log.csv"
+
+    with open(log_path, "w") as f:
+        f.write("episode,total_reward,detected,avg_reward,avg_detected,epsilon,avg_loss\n")
+    
+    
     n_episodes = 500
     recent_rewards = deque(maxlen=50)
     recent_detected = deque(maxlen=50)
@@ -104,6 +102,12 @@ def main():
         avg_detected = np.mean(recent_detected)
         avg_loss = np.mean(recent_losses) if recent_losses else 0.0
 
+        with open(log_path, "a") as f:
+            f.write(
+                f"{episode},{total_reward},{info['detected_targets']},"
+                f"{avg_reward},{avg_detected},{agent.epsilon()},{avg_loss}\n"
+            )
+    
         progress.set_postfix(
             {
                 "avg_reward": f"{avg_reward:.2f}",
